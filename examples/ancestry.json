@@ -1,0 +1,12 @@
+{
+  "datasets": {
+    "wiki-dump-2025": {"license": "CC-BY-SA-4.0", "url": "https://dumps.wikimedia.org/", "attribution": "Wikipedia contributors"},
+    "stack-snippets": {"license": "CC-BY-SA-4.0", "attribution": "Stack Exchange users"},
+    "support-tickets": {"license": "proprietary-owned", "attribution": "Acme Inc."},
+    "academic-qa": {"license": "CC-BY-NC-4.0", "attribution": "Univ. QA Lab"},
+    "public-domain-books": {"license": "CC0-1.0"},
+    "wiki-clean": {"parents": ["wiki-dump-2025"], "transform": "dedupe + language filter"},
+    "instruct-mix": {"parents": ["wiki-clean", "stack-snippets", "public-domain-books"], "transform": "templated instruction generation"},
+    "my-finetune-v3": {"parents": ["instruct-mix", "support-tickets", "academic-qa"], "transform": "merge + PII scrub"}
+  }
+}
