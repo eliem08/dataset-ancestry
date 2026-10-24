@@ -1,5 +1,7 @@
 # dataset-ancestry
 
+[![CI](https://github.com/eliem08/dataset-ancestry/actions/workflows/ci.yml/badge.svg)](https://github.com/eliem08/dataset-ancestry/actions/workflows/ci.yml)
+
 > **Ancestry for datasets** — where your training data came from.
 
 "Is this fine-tuning set safe to use commercially?" Nobody can answer,
@@ -41,3 +43,26 @@ Licence rules are a simplified model for triage — not legal advice.
 - Auto-ingest lineage from Hugging Face dataset cards and data pipeline runs (dbt, Airflow)
 - Sample-level provenance (which rows came from which ancestor) for takedown requests
 - Signed provenance attestations (in-toto / SLSA style) for model releases
+
+## Development
+
+Zero runtime dependencies; Python 3.10+.
+
+```bash
+python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -e ".[dev]"
+python -m unittest discover -s tests -t .           # unit + CLI smoke tests
+ruff check . && ruff format --check .               # lint + format
+```
+
+```
+dataset_ancestry/core.py       domain logic (pure, importable, fully tested)
+dataset_ancestry/__main__.py   CLI (`dataset-ancestry ...` / `python -m dataset_ancestry ...`)
+tests/                unit tests + generated CLI smoke tests
+examples/             sample inputs used by the docs and smoke tests
+```
+
+CI runs lint and tests on Ubuntu and Windows across Python 3.10, 3.12 and 3.13.
+Design, data model, trade-offs and production path: **[ARCHITECTURE.md](ARCHITECTURE.md)**.
+
+Part of the [agent-economy](https://github.com/eliem08/agent-economy) portfolio (idea #34).

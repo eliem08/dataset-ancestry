@@ -1,4 +1,5 @@
 """Dataset lineage graph, content hashing and licence-obligation propagation."""
+
 from __future__ import annotations
 
 import hashlib
@@ -10,11 +11,22 @@ __all__ = ["LICENSES", "Lineage", "hash_dir", "Obligations"]
 
 # flags: by=attribution, sa=share-alike/copyleft, nc=non-commercial, nd=no-derivatives, known=recognised
 LICENSES = {
-    "CC0-1.0": {}, "public-domain": {}, "MIT": {"by": True}, "Apache-2.0": {"by": True}, "BSD-3-Clause": {"by": True},
-    "CC-BY-4.0": {"by": True}, "CC-BY-SA-4.0": {"by": True, "sa": "CC-BY-SA"}, "CC-BY-NC-4.0": {"by": True, "nc": True},
-    "CC-BY-NC-SA-4.0": {"by": True, "nc": True, "sa": "CC-BY-NC-SA"}, "CC-BY-ND-4.0": {"by": True, "nd": True},
-    "CC-BY-NC-ND-4.0": {"by": True, "nc": True, "nd": True}, "ODC-By-1.0": {"by": True}, "ODbL-1.0": {"by": True, "sa": "ODbL"},
-    "GPL-3.0": {"by": True, "sa": "GPL"}, "proprietary-owned": {"owned": True}, "proprietary-licensed": {"restricted": True},
+    "CC0-1.0": {},
+    "public-domain": {},
+    "MIT": {"by": True},
+    "Apache-2.0": {"by": True},
+    "BSD-3-Clause": {"by": True},
+    "CC-BY-4.0": {"by": True},
+    "CC-BY-SA-4.0": {"by": True, "sa": "CC-BY-SA"},
+    "CC-BY-NC-4.0": {"by": True, "nc": True},
+    "CC-BY-NC-SA-4.0": {"by": True, "nc": True, "sa": "CC-BY-NC-SA"},
+    "CC-BY-ND-4.0": {"by": True, "nd": True},
+    "CC-BY-NC-ND-4.0": {"by": True, "nc": True, "nd": True},
+    "ODC-By-1.0": {"by": True},
+    "ODbL-1.0": {"by": True, "sa": "ODbL"},
+    "GPL-3.0": {"by": True, "sa": "GPL"},
+    "proprietary-owned": {"owned": True},
+    "proprietary-licensed": {"restricted": True},
 }
 
 
@@ -60,7 +72,7 @@ class Lineage:
                 raise ValueError(f"source dataset {name} has no license")
 
     @classmethod
-    def load(cls, path: str) -> "Lineage":
+    def load(cls, path: str) -> Lineage:
         with open(path, encoding="utf-8") as fh:
             return cls(json.load(fh)["datasets"])
 
@@ -83,7 +95,7 @@ class Lineage:
         return order
 
     def sources(self, name: str) -> list[str]:
-        nodes = [name] + self.ancestors(name)
+        nodes = [name, *self.ancestors(name)]
         return [n for n in nodes if not self.ds[n].get("parents")]
 
     def obligations(self, name: str) -> Obligations:
@@ -107,7 +119,9 @@ class Lineage:
         if len(ob.share_alike) > 1:
             ob.conflicts.append(f"incompatible share-alike licences combined: {sorted(ob.share_alike)}")
         if ob.share_alike and any(LICENSES.get(self.ds[s].get("license"), {}).get("owned") for s in self.sources(name)):
-            ob.conflicts.append("share-alike data merged with proprietary data: the derivative must be released under the SA licence")
+            ob.conflicts.append(
+                "share-alike data merged with proprietary data: the derivative must be released under the SA licence"
+            )
         if ob.no_derivatives and self.ds[name].get("parents"):
             ob.conflicts.append(f"derivative built from no-derivatives sources: {ob.no_derivatives}")
         return ob
@@ -121,7 +135,9 @@ class Lineage:
             reasons.append(f"non-commercial ancestors: {ob.non_commercial}")
         if use in ("redistribution", "commercial_redistribution") and ob.restricted:
             reasons.append(f"third-party proprietary ancestors can't be redistributed: {ob.restricted}")
-        if use == "redistribution" and any(LICENSES.get(self.ds[s].get("license"), {}).get("owned") for s in self.sources(name)):
+        if use == "redistribution" and any(
+            LICENSES.get(self.ds[s].get("license"), {}).get("owned") for s in self.sources(name)
+        ):
             reasons.append("contains your own proprietary data - redistribution would publish it")
         notes = []
         if ob.attribution:
@@ -135,10 +151,12 @@ class Lineage:
         if not expected:
             return False, "no root_hash recorded in manifest"
         actual = hash_dir(data_dir)["root"]
-        return (actual == expected), ("match" if actual == expected else f"drift: manifest {expected[:12]} != disk {actual[:12]}")
+        return (actual == expected), (
+            "match" if actual == expected else f"drift: manifest {expected[:12]} != disk {actual[:12]}"
+        )
 
     def to_dot(self, name: str) -> str:
-        nodes = [name] + self.ancestors(name)
+        nodes = [name, *self.ancestors(name)]
         lines = ["digraph lineage {", "  rankdir=BT;", "  node [shape=box, style=rounded];"]
         for n in nodes:
             d = self.ds[n]

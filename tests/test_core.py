@@ -1,4 +1,3 @@
-import json
 import os
 import pathlib
 import tempfile
@@ -17,8 +16,10 @@ class Tests(unittest.TestCase):
         anc = self.lin.ancestors("my-finetune-v3")
         self.assertIn("wiki-dump-2025", anc)
         self.assertEqual(len(anc), len(set(anc)))
-        self.assertEqual(set(self.lin.sources("my-finetune-v3")),
-                         {"wiki-dump-2025", "stack-snippets", "public-domain-books", "support-tickets", "academic-qa"})
+        self.assertEqual(
+            set(self.lin.sources("my-finetune-v3")),
+            {"wiki-dump-2025", "stack-snippets", "public-domain-books", "support-tickets", "academic-qa"},
+        )
 
     def test_obligations(self):
         ob = self.lin.obligations("my-finetune-v3")

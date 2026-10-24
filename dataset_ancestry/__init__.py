@@ -1,4 +1,5 @@
-"""Ancestry for datasets: where your training data came from"""
-from .core import *  # noqa: F401,F403
+"""Ancestry for datasets: where your training data came from."""
+
+from .core import *
 
 __version__ = "0.1.0"

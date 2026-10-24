@@ -15,7 +15,11 @@ def main(argv=None):
     c = sub.add_parser("check")
     c.add_argument("manifest")
     c.add_argument("dataset")
-    c.add_argument("--use", required=True, choices=["commercial_training", "research", "redistribution", "commercial_redistribution"])
+    c.add_argument(
+        "--use",
+        required=True,
+        choices=["commercial_training", "research", "redistribution", "commercial_redistribution"],
+    )
     h = sub.add_parser("hash")
     h.add_argument("dir")
     a = ap.parse_args(argv)
@@ -33,7 +37,9 @@ def main(argv=None):
             print(f"  - {r}")
         return 0 if ok else 2
     ob = lin.obligations(a.dataset)
-    print(f"Ancestry of {a.dataset}: {len(lin.ancestors(a.dataset))} ancestors, sources: {', '.join(lin.sources(a.dataset))}")
+    print(
+        f"Ancestry of {a.dataset}: {len(lin.ancestors(a.dataset))} ancestors, sources: {', '.join(lin.sources(a.dataset))}"
+    )
     for field_name, value in ob.__dict__.items():
         if value:
             print(f"  {field_name}: {value}")
