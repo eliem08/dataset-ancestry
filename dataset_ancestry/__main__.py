@@ -4,7 +4,7 @@ import json
 import os
 import sys
 
-from .core import Lineage, hash_dir
+from .core import USES, Lineage, hash_dir
 
 
 def _run(argv=None):
@@ -20,7 +20,7 @@ def _run(argv=None):
     c.add_argument(
         "--use",
         required=True,
-        choices=["commercial_training", "research", "redistribution", "commercial_redistribution"],
+        choices=USES,
     )
     h = sub.add_parser("hash")
     h.add_argument("dir")

@@ -7,7 +7,9 @@ import json
 import os
 from dataclasses import dataclass, field
 
-__all__ = ["LICENSES", "Lineage", "hash_dir", "Obligations"]
+__all__ = ["LICENSES", "USES", "Lineage", "hash_dir", "Obligations"]
+
+USES = ("commercial_training", "research", "redistribution", "commercial_redistribution")
 
 # flags: by=attribution, sa=share-alike/copyleft, nc=non-commercial, nd=no-derivatives, known=recognised
 LICENSES = {
@@ -130,6 +132,8 @@ class Lineage:
         return ob
 
     def check(self, name: str, use: str) -> tuple[bool, list[str]]:
+        if use not in USES:  # an unknown use must never fall through to "allowed"
+            raise ValueError(f"use must be one of {list(USES)}, got {use!r}")
         ob = self.obligations(name)
         reasons = list(ob.conflicts)
         if ob.unknown:

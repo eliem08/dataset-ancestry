@@ -36,6 +36,11 @@ class Tests(unittest.TestCase):
         self.assertTrue(ok)
         self.assertTrue(self.lin.check("public-domain-books", "redistribution")[0])
 
+    def test_unknown_use_is_rejected_not_waved_through(self):
+        for use in ("Commercial_Training", "commercial-training", "sell it", ""):
+            with self.subTest(use=use), self.assertRaises(ValueError):
+                self.lin.check("instruct-mix", use)
+
     def test_validation_and_cycles(self):
         with self.assertRaises(ValueError):
             Lineage({"a": {"parents": ["missing"]}})
