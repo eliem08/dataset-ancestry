@@ -1,16 +1,45 @@
-# dataset-ancestry
+<!-- sell-kit:start -->
+# Dataset Ancestry
 
 [![CI](https://github.com/eliem08/dataset-ancestry/actions/workflows/ci.yml/badge.svg)](https://github.com/eliem08/dataset-ancestry/actions/workflows/ci.yml)
 
-> **Ancestry for datasets** — where your training data came from.
+> **Know where your training data came from and what you are allowed to do with it.**
 
-"Is this fine-tuning set safe to use commercially?" Nobody can answer,
-because the set was built from a filtered merge of a scrape of a dataset that
-was CC-BY-NC three hops back. `dataset-ancestry` records dataset lineage as
-a graph, propagates licence obligations from every ancestor, and tells you
-what you may do with the result.
+**Who it's for:** ML teams and legal counsel shipping models trained on mixed datasets.
 
-## What the MVP does
+**The problem:** Fine-tuning sets are merges of scrapes of datasets, and nobody can say whether commercial use is allowed.
+
+**What you get:** A lineage graph that propagates licence obligations from every source, checks a proposed use and verifies content hashes against the manifest.
+
+## Quickstart
+
+Customers receive a release archive with the wheel and the examples. Python 3.10+ and no other dependencies.
+
+```bash
+pip install dataset_ancestry-0.1.0-py3-none-any.whl
+dataset-ancestry report examples/ancestry.json my-finetune-v3
+dataset-ancestry check examples/ancestry.json instruct-mix --use commercial_training
+dataset-ancestry dot examples/ancestry.json my-finetune-v3
+```
+
+## Pricing
+
+Every plan starts with a 14-day free trial. Prices in USD, billed monthly unless noted.
+
+| Plan | Price | Includes |
+|---|---|---|
+| **Team** | $99 per month | Unlimited lineage graphs; Use checks; Hash verification |
+| **Business** | $499 per month | Audit-ready reports; Custom licence library; Multiple teams |
+| **Enterprise** | $2,000 per month | Legal review workflow; On-prem; SLA |
+
+To start a trial or buy a plan, email **sales@YOUR-DOMAIN.com**.
+
+## Licence
+
+Proprietary. Copyright (c) 2026 eliem08. All rights reserved. Use requires a paid plan or an active trial; see [LICENSE](LICENSE).
+<!-- sell-kit:end -->
+
+## What it does
 
 - **Lineage manifest** (`ancestry.json`): source datasets (licence, URL, content hash)
   and derived datasets (transform, parents)

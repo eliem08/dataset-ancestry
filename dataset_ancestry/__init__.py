@@ -1,4 +1,4 @@
-"""Ancestry for datasets: where your training data came from."""
+"""Dataset Ancestry: Know where your training data came from and what you are allowed to do with it."""
 
 from .core import *
 

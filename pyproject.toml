@@ -5,16 +5,17 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "dataset-ancestry"
 version = "0.1.0"
-description = "Ancestry for datasets: where your training data came from"
+description = "Know where your training data came from and what you are allowed to do with it."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = { text = "Proprietary" }
 authors = [{ name = "eliem08" }]
 dependencies = []
 classifiers = [
   "Programming Language :: Python :: 3",
-  "License :: OSI Approved :: MIT License",
+  "License :: Other/Proprietary License",
   "Operating System :: OS Independent",
+  "Private :: Do Not Upload",
 ]
 
 [project.optional-dependencies]
