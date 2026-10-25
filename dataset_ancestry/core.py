@@ -74,7 +74,10 @@ class Lineage:
     @classmethod
     def load(cls, path: str) -> Lineage:
         with open(path, encoding="utf-8-sig") as fh:
-            return cls(json.load(fh)["datasets"])
+            doc = json.load(fh)
+        if not isinstance(doc, dict) or not isinstance(doc.get("datasets"), dict):
+            raise ValueError(f"{path}: expected an object with a 'datasets' map")
+        return cls(doc["datasets"])
 
     def ancestors(self, name: str) -> list[str]:
         """All ancestors (excluding self), parents before grandparents, cycle-checked."""
