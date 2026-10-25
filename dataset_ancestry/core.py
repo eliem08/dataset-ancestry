@@ -73,7 +73,7 @@ class Lineage:
 
     @classmethod
     def load(cls, path: str) -> Lineage:
-        with open(path, encoding="utf-8") as fh:
+        with open(path, encoding="utf-8-sig") as fh:
             return cls(json.load(fh)["datasets"])
 
     def ancestors(self, name: str) -> list[str]:
