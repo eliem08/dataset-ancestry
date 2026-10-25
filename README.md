@@ -22,6 +22,18 @@ dataset-ancestry check examples/ancestry.json instruct-mix --use commercial_trai
 dataset-ancestry dot examples/ancestry.json my-finetune-v3
 ```
 
+## Web app and API
+
+Every command is also a JSON API endpoint and a browser form, served by the built-in web app.
+
+```bash
+dataset-ancestry-web --port 8000          # then open http://127.0.0.1:8000
+docker build -t dataset-ancestry . && docker run -p 8000:8000 -v dataset-ancestry-data:/data dataset-ancestry
+```
+
+Endpoints: `POST /api/report`, `POST /api/dot`, `POST /api/check`, `POST /api/hash`, plus `GET /healthz` and `GET /api/spec` (machine-readable field list).
+Files are sent as `{"name": ..., "content": ...}`, folders as `{"files": [...]}` or a base64 zip.
+
 ## Pricing
 
 Every plan starts with a 14-day free trial. Prices in USD, billed monthly unless noted.

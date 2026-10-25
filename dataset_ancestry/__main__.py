@@ -7,7 +7,7 @@ import sys
 from .core import USES, Lineage, hash_dir
 
 
-def _run(argv=None):
+def build_parser():
     ap = argparse.ArgumentParser(prog="dataset-ancestry")
     sub = ap.add_subparsers(dest="cmd", required=True)
     for name in ("report", "dot"):
@@ -24,6 +24,11 @@ def _run(argv=None):
     )
     h = sub.add_parser("hash")
     h.add_argument("dir")
+    return ap
+
+
+def _run(argv=None):
+    ap = build_parser()
     a = ap.parse_args(argv)
     if a.cmd == "hash":
         print(json.dumps(hash_dir(a.dir), indent=2))

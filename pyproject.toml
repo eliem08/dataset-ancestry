@@ -23,6 +23,7 @@ dev = ["ruff>=0.6"]
 
 [project.scripts]
 dataset-ancestry = "dataset_ancestry.__main__:main"
+dataset-ancestry-web = "dataset_ancestry.web:main"
 
 [project.urls]
 Repository = "https://github.com/eliem08/dataset-ancestry"
