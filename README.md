@@ -47,7 +47,7 @@ Every plan starts with a 14-day free trial. Prices in USD, billed monthly unless
 | **Business** | $499 per month | Audit-ready reports; Custom licence library; Multiple teams |
 | **Enterprise** | $2,000 per month | Legal review workflow; On-prem; SLA |
 
-To start a trial or buy a plan, email **sales@YOUR-DOMAIN.com**.
+To start a trial or buy a plan, [request access](https://github.com/eliem08/dataset-ancestry/issues/new?title=Dataset%20Ancestry%20trial&labels=sales).
 
 ## Licence
 
