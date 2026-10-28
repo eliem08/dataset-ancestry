@@ -42,13 +42,14 @@ Files are sent as `{"name": ..., "content": ...}`, folders as `{"files": [...]}`
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/eliem08/dataset-ancestry)
 
 `render.yaml` (one click, above) and `fly.toml` (`fly launch --copy-config`) both run the Dockerfile with a persistent `/data` volume and a `/healthz` check.
-To sell self-serve, set four variables and point a Stripe webhook at `https://<your-host>/billing/webhook` (events `checkout.session.completed` and `customer.subscription.deleted`):
+To sell self-serve, set four variables and point a Stripe webhook at `https://<your-host>/billing/webhook` (events `checkout.session.completed` and `customer.subscription.deleted`).
+Copy `.env.example` to `.env` and fill in real values (never commit `.env`).
 
 | Variable | Example |
 |---|---|
 | `STRIPE_SECRET_KEY` | `sk_live_...` |
 | `STRIPE_WEBHOOK_SECRET` | `whsec_...` |
-| `STRIPE_PRICES` | `team=price_123,business=price_456` |
+| `STRIPE_PRICES` | `team=price_123,business=price_456,enterprise=price_789` |
 | `PUBLIC_URL` | `https://dataset-ancestry.example.com` |
 
 Buyers pick a plan on `/pricing`, pay on Stripe Checkout and see their API key once on the success page. Cancelling the subscription revokes the key. A selling server always requires a key.
@@ -60,8 +61,10 @@ Every plan starts with a 14-day free trial. Prices in USD, billed monthly unless
 | Plan | Price | Includes |
 |---|---|---|
 | **Team** | $99 per month | Unlimited lineage graphs; Use checks; Hash verification |
-| **Business** | $499 per month | Audit-ready reports; Custom licence library; Multiple teams |
-| **Enterprise** | $2,000 per month | Legal review workflow; On-prem; SLA |
+| **Business** | $499 per month | Everything in Team |
+| **Enterprise** | $2,000 per month | Everything in Team; SLA |
+
+All plans unlock the same software in this release; higher tiers add licence scope and support, not gated features.
 
 To start a trial or buy a plan, [request access](https://github.com/eliem08/dataset-ancestry/issues/new?title=Dataset%20Ancestry%20trial&labels=sales).
 
@@ -103,6 +106,7 @@ Licence rules are a simplified model for triage — not legal advice.
 - Auto-ingest lineage from Hugging Face dataset cards and data pipeline runs (dbt, Airflow)
 - Sample-level provenance (which rows came from which ancestor) for takedown requests
 - Signed provenance attestations (in-toto / SLSA style) for model releases
+- Custom licence library, multiple-team support, legal review workflow, on-prem deployment
 
 ## Development
 
