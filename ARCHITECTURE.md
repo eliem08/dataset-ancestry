@@ -36,10 +36,11 @@ licence obligations, which is the most common misconception this tool corrects.
   added, removed or changed file.
 - **Fail-closed validation at load:** a manifest with a dangling parent can't produce a misleading "allowed".
 
-## 5. Production architecture
-A lineage service fed by pipeline hooks (Airflow/Dagster/dbt emit edges), Hugging Face dataset
-card parsing, Postgres (graph as adjacency + materialised closure), in-toto attestations signed
-at release, and a policy check in CI before model training jobs start.
+## 5. Future production architecture (not shipped)
+The items below are roadmap, not in this release: a lineage service fed by pipeline hooks
+(Airflow/Dagster/dbt emit edges), Hugging Face dataset card parsing, Postgres (graph as
+adjacency + materialised closure), in-toto attestations signed at release, and a policy check
+in CI before model training jobs start.
 
 ## 6. Risks
 Upstream licence metadata is often wrong, so source-level evidence (licence file hash, URL
