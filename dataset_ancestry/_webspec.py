@@ -123,4 +123,24 @@ SPEC = {
             "id": "hash",
         },
     ],
+    "plans": [
+        {
+            "key": "team",
+            "name": "Team",
+            "price": "$99 per month",
+            "features": ["Unlimited lineage graphs", "Use checks", "Hash verification"],
+        },
+        {
+            "key": "business",
+            "name": "Business",
+            "price": "$499 per month",
+            "features": ["Lineage reports", "Graph export (DOT)", "Multiple teams"],
+        },
+        {
+            "key": "enterprise",
+            "name": "Enterprise",
+            "price": "$2,000 per month",
+            "features": ["Self-hosted deployment", "SLA"],
+        },
+    ],
 }
