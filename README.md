@@ -55,15 +55,18 @@ Buyers pick a plan on `/pricing`, pay on Stripe Checkout and see their API key o
 
 ## Pricing
 
-Every plan starts with a 14-day free trial. Prices in USD, billed monthly unless noted.
+Monthly plans start with a 14-day free trial. Prices in USD, billed monthly unless noted.
 
 | Plan | Price | Includes |
 |---|---|---|
 | **Team** | $99 per month | Unlimited lineage graphs; Use checks; Hash verification |
-| **Business** | $499 per month | Audit-ready reports; Custom licence library; Multiple teams |
-| **Enterprise** | $2,000 per month | Legal review workflow; On-prem; SLA |
+| **Business** | $499 per month | Lineage reports; Graph export (DOT); Multiple teams |
+| **Enterprise** | $2,000 per month | Self-hosted deployment; SLA |
 
 To start a trial or buy a plan, [request access](https://github.com/eliem08/dataset-ancestry/issues/new?title=Dataset%20Ancestry%20trial&labels=sales).
+
+Plan note: every plan runs the same software, and every API key unlocks all of it. Seat, agent and volume
+limits are licence terms; the code does not enforce them. Support, SLA and done-for-you items are services.
 
 ## Licence
 
