@@ -5,6 +5,7 @@ import os
 import sys
 
 from .core import USES, Lineage, hash_dir
+from .licenses import LICENSES, lookup
 
 
 def build_parser():
@@ -24,12 +25,27 @@ def build_parser():
     )
     h = sub.add_parser("hash")
     h.add_argument("dir")
+    lic = sub.add_parser("licenses", help="list recognised licences, or look one name up")
+    lic.add_argument("name", nargs="?", help="a licence name as written in your manifest, e.g. 'CC BY-SA 3.0'")
     return ap
 
 
 def _run(argv=None):
     ap = build_parser()
     a = ap.parse_args(argv)
+    if a.cmd == "licenses":
+        if a.name:
+            found = lookup(a.name)
+            if not found:
+                print(f"{a.name!r} is not recognised; it will be reported as an unknown licence")
+                return 1
+            canon, flags = found
+            print(f"{a.name!r} -> {canon}: {', '.join(sorted(flags)) or 'no obligations'}")
+            return 0
+        for canon, flags in LICENSES.items():
+            print(f"{canon:<24} {', '.join(f'{k}={v}' if v is not True else k for k, v in flags.items()) or '-'}")
+        print("plus every Creative Commons licence and version (CC-BY, -SA, -NC, -ND, 1.0 to 4.0, ported)")
+        return 0
     if a.cmd == "hash":
         print(json.dumps(hash_dir(a.dir), indent=2))
         return 0

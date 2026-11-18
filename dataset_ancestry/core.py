@@ -7,29 +7,11 @@ import json
 import os
 from dataclasses import dataclass, field
 
+from .licenses import LICENSES, lookup
+
 __all__ = ["LICENSES", "USES", "Lineage", "hash_dir", "Obligations"]
 
 USES = ("commercial_training", "research", "redistribution", "commercial_redistribution")
-
-# flags: by=attribution, sa=share-alike/copyleft, nc=non-commercial, nd=no-derivatives, known=recognised
-LICENSES = {
-    "CC0-1.0": {},
-    "public-domain": {},
-    "MIT": {"by": True},
-    "Apache-2.0": {"by": True},
-    "BSD-3-Clause": {"by": True},
-    "CC-BY-4.0": {"by": True},
-    "CC-BY-SA-4.0": {"by": True, "sa": "CC-BY-SA"},
-    "CC-BY-NC-4.0": {"by": True, "nc": True},
-    "CC-BY-NC-SA-4.0": {"by": True, "nc": True, "sa": "CC-BY-NC-SA"},
-    "CC-BY-ND-4.0": {"by": True, "nd": True},
-    "CC-BY-NC-ND-4.0": {"by": True, "nc": True, "nd": True},
-    "ODC-By-1.0": {"by": True},
-    "ODbL-1.0": {"by": True, "sa": "ODbL"},
-    "GPL-3.0": {"by": True, "sa": "GPL"},
-    "proprietary-owned": {"owned": True},
-    "proprietary-licensed": {"restricted": True},
-}
 
 
 @dataclass
@@ -41,6 +23,11 @@ class Obligations:
     restricted: list = field(default_factory=list)
     unknown: list = field(default_factory=list)
     conflicts: list = field(default_factory=list)
+    weak_copyleft: list = field(default_factory=list)
+    use_policy: list = field(default_factory=list)  # acceptable-use terms to pass on downstream
+    user_cap: list = field(default_factory=list)  # separate licence needed above 700M monthly users
+    model_naming: list = field(default_factory=list)  # derived models must carry the licensor's name
+    other_llm_ban: list = field(default_factory=list)  # may not be used to improve other LLMs
 
 
 def _file_hash(path: str) -> str:
@@ -107,10 +94,11 @@ class Lineage:
         ob = Obligations()
         for src in self.sources(name):
             lic = self.ds[src].get("license", "")
-            flags = LICENSES.get(lic)
-            if flags is None:
+            found = lookup(lic)
+            if found is None:
                 ob.unknown.append(f"{src} ({lic or 'none'})")
                 continue
+            lic, flags = found
             if flags.get("by"):
                 ob.attribution.append(self.ds[src].get("attribution", src) + f" [{lic}]")
             if flags.get("nc"):
@@ -121,9 +109,27 @@ class Lineage:
                 ob.no_derivatives.append(src)
             if flags.get("restricted"):
                 ob.restricted.append(src)
-        if len(ob.share_alike) > 1:
+            for flag, bucket in (
+                ("weak", ob.weak_copyleft),
+                ("use_policy", ob.use_policy),
+                ("mau_cap", ob.user_cap),
+                ("naming", ob.model_naming),
+                ("no_other_llm", ob.other_llm_ban),
+            ):
+                if flags.get(flag):
+                    bucket.append(f"{src} [{lic}]")
+        families = set(ob.share_alike)
+        cc_sa_4 = all(
+            (lookup(self.ds[s].get("license", "")) or ("",))[0] == "CC-BY-SA-4.0"
+            for s in ob.share_alike.get("CC-BY-SA", [])
+        )
+        if families == {"CC-BY-SA", "GPL"} and cc_sa_4:
+            pass  # CC BY-SA 4.0 lists GPLv3 as a compatible licence: the combination must be released as GPLv3
+        elif len(families) > 1:
             ob.conflicts.append(f"incompatible share-alike licences combined: {sorted(ob.share_alike)}")
-        if ob.share_alike and any(LICENSES.get(self.ds[s].get("license"), {}).get("owned") for s in self.sources(name)):
+        if ob.share_alike and any(
+            (lookup(self.ds[s].get("license", "")) or ("", {}))[1].get("owned") for s in self.sources(name)
+        ):
             ob.conflicts.append(
                 "share-alike data merged with proprietary data: the derivative must be released under the SA licence"
             )
@@ -143,7 +149,7 @@ class Lineage:
         if use in ("redistribution", "commercial_redistribution") and ob.restricted:
             reasons.append(f"third-party proprietary ancestors can't be redistributed: {ob.restricted}")
         if use == "redistribution" and any(
-            LICENSES.get(self.ds[s].get("license"), {}).get("owned") for s in self.sources(name)
+            (lookup(self.ds[s].get("license", "")) or ("", {}))[1].get("owned") for s in self.sources(name)
         ):
             reasons.append("contains your own proprietary data - redistribution would publish it")
         notes = []
@@ -151,6 +157,23 @@ class Lineage:
             notes.append(f"attribution required: {len(ob.attribution)} source(s)")
         if ob.share_alike and use != "research":
             notes.append(f"share-alike applies to derived datasets: {sorted(ob.share_alike)}")
+            if set(ob.share_alike) == {"CC-BY-SA", "GPL"}:
+                notes.append("CC BY-SA 4.0 + GPLv3: release the combined dataset under GPLv3 (one-way compatibility)")
+        if ob.other_llm_ban and use in ("commercial_training", "research"):
+            notes.append(
+                f"Llama 2 terms: these may not be used to improve any LLM other than Llama 2 and its derivatives: "
+                f"{ob.other_llm_ban}"
+            )
+        if ob.use_policy:
+            notes.append(f"acceptable-use terms must be passed on to your users: {ob.use_policy}")
+        if ob.user_cap and use.startswith("commercial"):
+            notes.append(f"over 700 million monthly active users needs a separate licence from Meta: {ob.user_cap}")
+        if ob.model_naming and use == "commercial_training":
+            notes.append(
+                f"a model trained on these must carry the licensor's name (e.g. 'Llama ...'): {ob.model_naming}"
+            )
+        if ob.weak_copyleft and use != "research":
+            notes.append(f"weak copyleft: modified files stay under their licence: {ob.weak_copyleft}")
         return (not reasons), reasons + notes
 
     def verify(self, name: str, data_dir: str) -> tuple[bool, str]:
@@ -168,7 +191,7 @@ class Lineage:
         for n in nodes:
             d = self.ds[n]
             label = n + (f"\\n{d['license']}" if "license" in d else f"\\n({d.get('transform', 'derived')})")
-            color = "red" if LICENSES.get(d.get("license", ""), {}).get("nc") else "black"
+            color = "red" if (lookup(d.get("license", "")) or ("", {}))[1].get("nc") else "black"
             lines.append(f'  "{n}" [label="{label}", color={color}];')
             for p in d.get("parents", []):
                 lines.append(f'  "{p}" -> "{n}";')

@@ -42,5 +42,11 @@
     ]
    }
   }
+ },
+ {
+  "op": "licenses",
+  "payload": {
+   "name": "CC BY-SA 3.0"
+  }
  }
 ]

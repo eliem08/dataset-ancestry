@@ -9,7 +9,7 @@
 
 **The problem:** Fine-tuning sets are merges of scrapes of datasets, and nobody can say whether commercial use is allowed.
 
-**What you get:** A lineage graph that propagates licence obligations from every source, checks a proposed use and verifies content hashes against the manifest.
+**What you get:** A lineage graph that propagates licence obligations from every source (all Creative Commons versions, 50+ software, data and AI model licences including Llama, Gemma and OpenRAIL), checks a proposed use and verifies content hashes against the manifest.
 
 ## Quickstart
 
@@ -34,7 +34,7 @@ docker build -t dataset-ancestry . && docker run -p 8000:8000 -e API_KEYS=sk_...
 
 Every API call needs `Authorization: Bearer <key>` once any key exists; a server on a public address refuses to start without one. Calls are rate-limited per key (60/min, `--rate`) and metered: `dataset-ancestry-web usage` prints calls per key for billing.
 
-Endpoints: `POST /api/report`, `POST /api/dot`, `POST /api/check`, `POST /api/hash`, plus `GET /healthz` and `GET /api/spec` (machine-readable field list).
+Endpoints: `POST /api/report`, `POST /api/dot`, `POST /api/check`, `POST /api/hash`, `POST /api/licenses`, plus `GET /healthz` and `GET /api/spec` (machine-readable field list).
 Files are sent as `{"name": ..., "content": ...}`, folders as `{"files": [...]}` or a base64 zip.
 
 ## Deploy and sell
@@ -61,7 +61,7 @@ Monthly plans start with a 14-day free trial. Prices in USD, billed monthly unle
 | Plan | Price | Includes |
 |---|---|---|
 | **Team** | $99 per month | Unlimited lineage graphs; Use checks; Hash verification |
-| **Business** | $499 per month | Lineage reports; Graph export (DOT); Multiple teams |
+| **Business** | $499 per month | Lineage reports; Creative Commons, SPDX and AI model licences; Graph export (DOT); Multiple teams |
 | **Enterprise** | $2,000 per month | Self-hosted deployment; SLA |
 
 To start a trial or buy a plan, [request access](https://github.com/eliem08/dataset-ancestry/issues/new?title=Dataset%20Ancestry%20trial&labels=sales).
@@ -87,7 +87,17 @@ Proprietary. Copyright (c) 2026 eliem08. All rights reserved. Use requires a pai
   - `NC` (non-commercial) and `SA` / copyleft (share-alike) inherited
   - `ND` ancestors block derivatives entirely
   - unknown / proprietary licences flagged
-  - incompatible combinations (e.g. CC-BY-SA + CC-BY-NC-SA vs GPL) reported
+  - incompatible combinations (e.g. CC-BY-SA + CC-BY-NC-SA, GPL-2.0-only + GPL-3.0) reported; CC BY-SA 4.0 +
+    GPLv3 is allowed with a note, since BY-SA 4.0 is one-way compatible with GPLv3
+- **Licences recognised** (`dataset-ancestry licenses`, or `licenses "CC BY-NC 2.0"` to look one up):
+  - every Creative Commons licence and version, including ported ones
+  - permissive and public-domain: CC0, PDDL, Unlicense, MIT, ISC, BSD, Apache-2.0, ODC-By, CDLA-Permissive,
+    OGL-UK, Etalab, DL-DE-BY
+  - copyleft: ODbL, CDLA-Sharing, GPL-2.0 and 3.0, AGPL-3.0; weak copyleft LGPL, MPL-2.0 and EPL-2.0
+  - AI model licences: Llama 2, 3, 3.1, 3.2, 3.3 and 4 (acceptable-use policy, the 700M monthly-user cap, model
+    naming, and Llama 2's ban on improving other LLMs), Gemma, and the OpenRAIL family
+  - names are matched as people write them: `cc by-sa 3.0`, `Apache 2.0`, `MIT License`
+  - It checks the licence names you record, not the licence texts; it is a decision aid, not legal advice
 - **Use check**: `commercial_training`, `research`, `redistribution` → allowed / blocked + reasons
 - **Graph export** to Graphviz DOT
 

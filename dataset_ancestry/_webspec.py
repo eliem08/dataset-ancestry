@@ -122,6 +122,24 @@ SPEC = {
             ],
             "id": "hash",
         },
+        {
+            "prefix": ["licenses"],
+            "title": "List recognised licences, or look one name up",
+            "fields": [
+                {
+                    "dest": "name",
+                    "flag": None,
+                    "kind": "text",
+                    "required": False,
+                    "choices": None,
+                    "default": None,
+                    "help": "a licence name as written in your manifest, e.g. 'CC BY-SA 3.0'",
+                    "scope": "op",
+                    "append": False,
+                }
+            ],
+            "id": "licenses",
+        },
     ],
     "plans": [
         {
@@ -134,7 +152,12 @@ SPEC = {
             "key": "business",
             "name": "Business",
             "price": "$499 per month",
-            "features": ["Lineage reports", "Graph export (DOT)", "Multiple teams"],
+            "features": [
+                "Lineage reports",
+                "Creative Commons, SPDX and AI model licences",
+                "Graph export (DOT)",
+                "Multiple teams",
+            ],
         },
         {
             "key": "enterprise",
